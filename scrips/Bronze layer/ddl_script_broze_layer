@@ -1,0 +1,116 @@
+------------------------------------------------------------------------------------------------------------------
+This DDL script will drop existing tables and create new tables so be cautious before running this script 
+------------------------------------------------------------------------------------------------------------------
+
+USE [DataWarehouse]
+GO
+/****** Object:  StoredProcedure [bronze].[load_bronze]    Script Date: 28-08-2025 21:42:05 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER   PROCEDURE [bronze].[load_bronze] AS
+BEGIN TRY
+	Declare @start_time Datetime, @end_time Datetime
+	Print('==============================================================')
+	Print('Loading Bronze Layer')
+	Print('==============================================================')
+
+	Print('--------------------------------------------------------------')
+	Print('Loading CRM Table')	
+	Print('--------------------------------------------------------------')
+	
+	Print('>>Truncate Table: bronze.crm_cust_info')
+	SET @start_time = GetDATE();
+	TRUNCATE table bronze.crm_cust_info
+	Print('>>Bulk Insert : bronze.crm_cust_info')
+	
+	BULK INSERT bronze.crm_cust_info
+	FROM 'C:\Users\kunal\Desktop\AWS full\Data analysis first private project\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\cust_info.csv'
+	WITH (
+
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK);
+	SET @end_time = GetDATE();
+	Print('Total time taken: ' + CAST(Datediff(second, @start_time, @end_time) AS NVARCHAR))
+
+	SET @start_time = GetDATE();
+	Print('>>Truncate Table: bronze.crm_prd_info')
+	TRUNCATE table bronze.crm_prd_info
+	Print('>>Bulk Insert: bronze.crm_prd_info')
+	BULK INSERT bronze.crm_prd_info
+	FROM 'C:\Users\kunal\Desktop\AWS full\Data analysis first private project\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\prd_info.csv'
+	WITH (
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK);
+	SET @end_time = GetDATE();
+	Print('Total time taken' + CAST(Datediff(second, @start_time, @end_time) AS NVARCHAR))
+
+	SET @start_time = GetDATE();
+	Print('>>Truncate Table: bronze.crm_sales_details')
+	TRUNCATE table bronze.crm_sales_details
+	Print('>>Bulk Insert: bronze.crm_sales_details')
+	BULK INSERT bronze.crm_sales_details
+	FROM 'C:\Users\kunal\Desktop\AWS full\Data analysis first private project\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\sales_details.csv'
+	WITH (
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK)
+	SET @end_time = GetDATE();
+	Print('Total time taken: ' + CAST(Datediff(second, @start_time, @end_time) AS NVARCHAR))
+	
+	Print('--------------------------------------------------------------')
+	Print('Loading ERP Table')	
+	Print('--------------------------------------------------------------')
+
+	SET @start_time = GetDATE();
+	Print('>>Truncate Table: bronze.erp_cust_az12')
+	TRUNCATE table bronze.erp_cust_az12
+	Print('>>Bulk Insert: bronze.erp_cust_az12')
+	BULK INSERT bronze.erp_cust_az12
+	FROM 'C:\Users\kunal\Desktop\AWS full\Data analysis first private project\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\CUST_AZ12.csv'
+	WITH (
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK)
+	SET @end_time = GetDATE();
+	Print('Total time taken: ' + CAST(Datediff(second, @start_time, @end_time) AS NVARCHAR))
+
+	SET @start_time = GetDATE();
+	Print('>>Truncate Table: bronze.erp_loc_a101')
+	TRUNCATE table bronze.erp_loc_a101
+	Print('>>Bulk Insert: bronze.erp_loc_a101')
+	BULK INSERT bronze.erp_loc_a101
+	FROM 'C:\Users\kunal\Desktop\AWS full\Data analysis first private project\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\LOC_A101.csv'
+	WITH (
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK);
+	SET @end_time = GetDATE();
+	Print('Total time taken: ' + CAST(Datediff(second, @start_time, @end_time) AS NVARCHAR))
+
+	SET @start_time = GetDATE();
+	Print('>>Truncate Table: bronze.erp_pax_cat_g1v2')
+	TRUNCATE table bronze.erp_pax_cat_g1v2
+	Print('>>Bulk Insert: bronze.erp_pax_cat_g1v2')
+	BULK INSERT bronze.erp_pax_cat_g1v2
+	FROM 'C:\Users\kunal\Desktop\AWS full\Data analysis first private project\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\PX_CAT_G1V2.csv'
+	WITH (
+	FIRSTROW = 2,
+	FIELDTERMINATOR = ',',
+	TABLOCK);
+	SET @end_time = GetDATE();
+	Print('Total time taken: ' + CAST(Datediff(second, @start_time, @end_time) AS NVARCHAR))
+END TRY
+
+BEGIN CATCH
+		Print('==============================================================')
+		Print('Error  Occured During the bronze layer')
+		Print('==============================================================')
+		Print('Error Message' + Error_Message());
+		Print('Error Message' + Cast(Error_number() AS NVARCHAR))
+		Print('Error Message' + Cast(Error_state() AS NVARCHAR)	   )
+END CATCH
